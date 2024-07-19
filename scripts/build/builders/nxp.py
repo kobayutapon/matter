@@ -48,13 +48,16 @@ class NxpBoard(Enum):
         else:
             raise Exception('Unknown board type: %r' % self)
 
-    def FolderName(self):
+    def FolderName(self, os_env):
         if self == NxpBoard.K32W0:
             return 'k32w/k32w0'
         elif self == NxpBoard.K32W1:
             return 'k32w/k32w1'
         elif self == NxpBoard.RW61X:
-            return 'zephyr'
+            if os_env == NxpOsUsed.ZEPHYR:
+                return 'zephyr'
+            else:
+                return 'rt/rw61x'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -94,8 +97,8 @@ class NxpApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def BuildRoot(self, root, board):
-        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName())
+    def BuildRoot(self, root, board, os_env):
+        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
 
 
 class NxpBuilder(GnBuilder):
@@ -113,9 +116,16 @@ class NxpBuilder(GnBuilder):
                  use_fro32k: bool = False,
                  enable_lit: bool = False,
                  enable_rotating_id: bool = False,
-                 has_sw_version_2: bool = False):
+                 has_sw_version_2: bool = False,
+                 disable_ble: bool = False,
+                 enable_thread: bool = False,
+                 enable_wifi: bool = False,
+                 disable_ipv4: bool = False,
+                 enable_shell: bool = False,
+                 enable_ota: bool = False,
+                 bootloader_mcuboot: bool = False):
         super(NxpBuilder, self).__init__(
-            root=app.BuildRoot(root, board),
+            root=app.BuildRoot(root, board, os_env),
             runner=runner)
         self.code_root = root
         self.app = app
@@ -129,6 +139,13 @@ class NxpBuilder(GnBuilder):
         self.enable_lit = enable_lit
         self.enable_rotating_id = enable_rotating_id
         self.has_sw_version_2 = has_sw_version_2
+        self.disable_ipv4 = disable_ipv4
+        self.disable_ble = disable_ble
+        self.enable_thread = enable_thread
+        self.enable_wifi = enable_wifi
+        self.enable_ota = enable_ota
+        self.enable_shell = enable_shell
+        self.bootloader_mcuboot = bootloader_mcuboot
 
     def GnBuildArgs(self):
         args = []

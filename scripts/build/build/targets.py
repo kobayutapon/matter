@@ -530,6 +530,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rw61x')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
+    target.AppendModifier(name="is_sdk_2_15", is_sdk_2_15=True).OnlyIfRe('rw61x').ExceptIfRe('zephyr')
 
     return target
 

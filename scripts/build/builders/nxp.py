@@ -123,7 +123,8 @@ class NxpBuilder(GnBuilder):
                  disable_ipv4: bool = False,
                  enable_shell: bool = False,
                  enable_ota: bool = False,
-                 bootloader_mcuboot: bool = False):
+                 bootloader_mcuboot: bool = False,
+                 is_sdk_2_15: bool = False):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -146,6 +147,7 @@ class NxpBuilder(GnBuilder):
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
         self.bootloader_mcuboot = bootloader_mcuboot
+        self.is_sdk_2_15 = is_sdk_2_15
 
     def GnBuildArgs(self):
         args = []
@@ -175,6 +177,33 @@ class NxpBuilder(GnBuilder):
 
         if self.has_sw_version_2:
             args.append('nxp_software_version=2')
+        
+        if self.enable_ota:
+            # OTA is enabled by default on kw32
+            if self.board == NxpBoard.RW61X:
+                args.append('chip_enable_ota_requestor=true')
+        
+        if self.bootloader_mcuboot:
+            args.append('no_mcuboot=false')
+        
+        if self.enable_wifi:
+            args.append('chip_enable_wifi=true')
+        
+        if self.disable_ble:
+            args.append('chip_enable_ble=false')
+        
+        if self.enable_shell:
+            args.append('chip_enable_matter_cli=true')
+        
+        if self.enable_thread:
+            # thread is enabled by default on kw32
+            if self.board == NxpBoard.RW61X:
+                args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
+                if self.enable_wifi:
+                    args.append('openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\"')
+        
+        if self.is_sdk_2_15:
+            args.append('is_sdk_2_15=true')
 
         return args
 

@@ -128,9 +128,9 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-all-clusters-wifi \
-                      --target nxp-rw61x-freertos-all-clusters-thread \
-                      --target nxp-rw61x-freertos-all-clusters-thread-wifi \
+                      --target nxp-rw61x-freertos-all-clusters-wifi-is_sdk_2_15 \
+                      --target nxp-rw61x-freertos-all-clusters-thread-is_sdk_2_15 \
+                      --target nxp-rw61x-freertos-all-clusters-thread-wifi-is_sdk_2_15 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -139,9 +139,9 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-wifi \
-                      --target nxp-rw61x-freertos-thermostat-thread \
-                      --target nxp-rw61x-freertos-thermostat-thread-wifi \
+                      --target nxp-rw61x-freertos-thermostat-wifi-is_sdk_2_15 \
+                      --target nxp-rw61x-freertos-thermostat-thread-is_sdk_2_15 \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi-is_sdk_2_15 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -150,9 +150,9 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-laundry-washer-wifi \
-                      --target nxp-rw61x-freertos-laundry-washer-thread \
-                      --target nxp-rw61x-freertos-laundry-washer-thread-wifi \
+                      --target nxp-rw61x-freertos-laundry-washer-wifi-is_sdk_2_15 \
+                      --target nxp-rw61x-freertos-laundry-washer-thread-is_sdk_2_15 \
+                      --target nxp-rw61x-freertos-laundry-washer-thread-wifi-is_sdk_2_15 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "

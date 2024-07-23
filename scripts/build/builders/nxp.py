@@ -15,6 +15,7 @@
 import logging
 import os
 from enum import Enum, auto
+import importlib.util
 
 from .builder import BuilderOutput
 from .gn import GnBuilder
@@ -238,7 +239,41 @@ class NxpBuilder(GnBuilder):
                 build_args=build_args).strip()
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
         else:
-            super(NxpBuilder, self).generate()
+            cmd=""
+            if 'NXP_UPDATE_SDK_SCRIPT_DOCKER' in os.environ:
+                spec = importlib.util.spec_from_file_location("None", os.environ['NXP_UPDATE_SDK_SCRIPT_DOCKER'])
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                
+                for p in module.ALL_PLATFORM_SDK:
+                    if p.sdk_name == 'k32w0' and self.board == NxpBoard.K32W0 :
+                        cmd += 'export NXP_K32W0_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
+                    elif p.sdk_name == 'common' and self.os_env == NxpOsUsed.FREERTOS and (self.board == NxpBoard.RW61X or self.board == NxpBoard.K32W1) :
+                        cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
+                        print(p.sdk_storage_location_abspath)
+            cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s' % self.root
+
+            extra_args = []
+
+            if self.options.pw_command_launcher:
+                extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
+
+            if self.options.enable_link_map_file:
+                extra_args.append('chip_generate_link_map_file=true')
+
+            if self.options.pregen_dir:
+                extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
+
+            extra_args.extend(self.GnBuildArgs() or [])
+            print(extra_args)
+            if extra_args:
+                cmd += ' --args="%s' % ' '.join(extra_args) +'" '
+
+            cmd += self.output_dir
+
+            title = 'Generating ' + self.identifier
+            
+            self._Execute(['bash', '-c', cmd], title=title)
 
     def build_outputs(self):
         name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
